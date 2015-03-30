@@ -9,7 +9,8 @@ APP="$1"
 IMAGE="dokku/$APP"
 
 dokku_log_info1 "Running deploy scripts..."
-id=$(docker run -d $IMAGE /bin/bash -c "cd /app && ./deploy/bootstrap.sh")
-test $(docker wait $id) -eq 0
-docker commit $id $IMAGE > /dev/null
-dokku_log_info1 "$APP bootstrapped via bootstrap.sh"
+id=$(docker run -d $IMAGE /bin/bash -c "cd /app && test -d ./deploy && ./deploy/bootstrap.sh")
+if [[  $(docker wait $id) -eq 0 ]]; then
+  docker commit $id $IMAGE > /dev/null
+  dokku_log_info1 "$APP bootstrapped via bootstrap.sh"
+fi
